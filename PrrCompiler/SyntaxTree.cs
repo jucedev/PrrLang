@@ -6,11 +6,17 @@ public sealed class SyntaxTree
 {
     public IEnumerable<string> Diagnostics { get; }
     public Expression Root { get; }
-    public Token EndOfFileToken { get; }
+    private Token _endOfFileToken;
     public SyntaxTree(IEnumerable<string> diagnostics, Expression root, Token endOfFileToken)
     {
         Diagnostics = diagnostics;
         Root = root;
-        EndOfFileToken = endOfFileToken;
+        _endOfFileToken = endOfFileToken;
+    }
+
+    public static SyntaxTree Parse(string text)
+    {
+        var parser = new Parser(text);
+        return parser.Parse();
     }
 }

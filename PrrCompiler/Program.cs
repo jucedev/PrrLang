@@ -2,19 +2,22 @@
 
 internal static class Program
 {
-    static void Main(string[] args)
+    private static bool _showTree;
+
+    private static void Main(string[] args)
     {
         while (true)
         {
             Console.Write("> ");
             var input = Console.ReadLine();
-            if (string.IsNullOrWhiteSpace(input))
-                return;
+            
+            if (string.IsNullOrWhiteSpace(input) || 
+                EvaluateCommands(input))
+                continue;
 
-            var parser = new Parser(input);
-            var syntaxTree = parser.Parse();
-
-            Print(syntaxTree.Root);
+            var syntaxTree = SyntaxTree.Parse(input);
+            if (_showTree)
+                Print(syntaxTree.Root);
 
             if (!syntaxTree.Diagnostics.Any())
             {
@@ -24,13 +27,7 @@ internal static class Program
             }
             else
             {
-                Console.ForegroundColor = ConsoleColor.DarkRed;
-                foreach (var diagnostic in syntaxTree.Diagnostics)
-                {
-                    Console.WriteLine(diagnostic);
-                }
-
-                Console.ResetColor();
+                PrintDiagnostics(syntaxTree.Diagnostics);
             }
         }
     }
@@ -54,9 +51,37 @@ internal static class Program
         var lastChild = node.GetChildren().LastOrDefault();
         
         foreach (var child in node.GetChildren())
-        {
-            // Console.Write(indent);
             Print(child, indent, child == lastChild);
+    }
+
+    private static void PrintDiagnostics(IEnumerable<string> diagnostics)
+    {
+        Console.ForegroundColor = ConsoleColor.DarkRed;
+        
+        foreach (var diagnostic in diagnostics)
+            Console.WriteLine(diagnostic);
+
+        Console.ResetColor();
+    }
+
+    private static bool EvaluateCommands(string input)
+    {
+        switch (input)
+        {
+            case "clear":
+                Console.Clear();
+                break;
+            case "exit":
+                Environment.Exit(0);
+                break;
+            case "tree":
+                _showTree = !_showTree;
+                Console.WriteLine($"Tree visibile: {_showTree}");
+                break;
+            default:
+                return false;
         }
+        // executed a command
+        return true;
     }
 }
