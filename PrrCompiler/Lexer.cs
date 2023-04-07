@@ -4,8 +4,12 @@ internal class Lexer
 {
     private readonly string _text;
     private int _position;
-    private char CurrentChar => _position >= _text.Length ? '\0' : _text[_position];
+    private List<string> _diagnostics = new();
+    private char CurrentChar => 
+        _position >= _text.Length ? '\0' : _text[_position];
     
+    public IEnumerable<string> Diagnostic => _diagnostics;
+
     public Lexer(string text)
     {
         _text = text;
@@ -31,7 +35,8 @@ internal class Lexer
             var length = _position - start;
             var text = _text.Substring(start, length);
 
-            int.TryParse(text, out var value);
+            if (!int.TryParse(text, out var value))
+                _diagnostics.Add($"ERROR: bad number '{text}' cannot be represented by an Int32");
             
             return new Token(TokenType.Number, start, text, value);
         }
@@ -49,7 +54,7 @@ internal class Lexer
             return new Token(TokenType.WhiteSpace, start, text, null);
         }
 
-        return CurrentChar switch
+        var returnToken = CurrentChar switch
         {
             '+' => new Token(TokenType.Plus, _position++, "+", null),
             '-' => new Token(TokenType.Minus, _position++, "-", null),
@@ -59,37 +64,12 @@ internal class Lexer
             ')' => new Token(TokenType.CloseParenthesis, _position++, ")", null),
             _ => new Token(TokenType.BadToken, _position++, _text.Substring(_position - 1, 1), null)
         };
+
+        if (returnToken.Type == TokenType.BadToken) 
+            _diagnostics.Add($"ERROR: bad token: '{returnToken.Value}'");
+        
+        return returnToken;
     }
 
     private void Next() => _position++;
-}
-
-internal enum TokenType
-{
-    Number,
-    WhiteSpace,
-    Plus,
-    Minus,
-    Star,
-    ForwardSlash,
-    OpenParenthesis,
-    CloseParenthesis,
-    EndOfFile,
-    BadToken,
-}
-
-internal class Token
-{
-    public TokenType Type { get; }
-    public int Position { get; }
-    public string Value { get; }
-    public object? Result { get; }
-
-    public Token(TokenType type, int position, string value, object? result)
-    {
-        Type = type;
-        Position = position;
-        Value = value;
-        Result = result;
-    }
 }
