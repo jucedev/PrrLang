@@ -52,17 +52,32 @@ public class Parser
 
     public SyntaxTree Parse()
     {
-        var expression = ParseExpression();
+        var expression = ParseTerm();
         var endOfFileToken = Match(TokenType.EndOfFile);
         return new SyntaxTree(_diagnostics, expression, endOfFileToken);
     }
+    
+    private Expression ParseTerm()
+    {
+        var left = ParseFactor();
+        
+        while (Current.Type == TokenType.Plus || 
+               Current.Type == TokenType.Minus) 
+        {
+            var op = NextToken();
+            var right = ParseFactor();
+            left = new BinaryExpression(left, right, op);
+        }
 
-    private Expression ParseExpression()
+        return left;
+    }
+
+    private Expression ParseFactor()
     {
         var left = ParsePrimary();
         
-        while (Current.Type == TokenType.Plus || 
-               Current.Type == TokenType.Minus)
+        while (Current.Type == TokenType.Star ||
+               Current.Type == TokenType.ForwardSlash)
         {
             var op = NextToken();
             var right = ParsePrimary();
