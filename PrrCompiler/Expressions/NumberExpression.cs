@@ -1,4 +1,4 @@
-﻿namespace PrrCompiler;
+﻿namespace PrrCompiler.Expressions;
 
 public sealed class NumberExpression : Expression
 {

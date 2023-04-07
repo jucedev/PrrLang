@@ -1,4 +1,4 @@
-﻿using System.Runtime.InteropServices;
+﻿using PrrCompiler.Expressions;
 
 namespace PrrCompiler;
 
@@ -15,7 +15,7 @@ public class Evaluator
         return EvaluateExpression(_root);
     }
     
-    private int EvaluateExpression(Expression node)
+    private static int EvaluateExpression(Expression node)
     {
         switch (node)
         {
@@ -23,7 +23,7 @@ public class Evaluator
                 if (int.TryParse(n.NumberToken.Value as string, out var result))
                     return result;
                 
-                throw new Exception("Unexpected null");
+                throw new Exception("Number d");
             
             case BinaryExpression b:
             {
@@ -39,6 +39,8 @@ public class Evaluator
                     _ => throw new Exception($"Unexpected binary operator {b.Operator.Type}")
                 };
             }
+            case ParenthesisExpression p:
+                return EvaluateExpression(p.ParenthesizedExpression);
             default:
                 throw new Exception($"Unexpected node {node.Type}");
         }

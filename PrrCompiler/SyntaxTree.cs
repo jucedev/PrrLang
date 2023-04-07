@@ -1,4 +1,6 @@
-﻿namespace PrrCompiler;
+﻿using PrrCompiler.Expressions;
+
+namespace PrrCompiler;
 
 public sealed class SyntaxTree
 {

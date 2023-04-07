@@ -1,4 +1,6 @@
-﻿namespace PrrCompiler;
+﻿using PrrCompiler.Expressions;
+
+namespace PrrCompiler;
 
 public class Parser
 {
@@ -50,6 +52,11 @@ public class Parser
         return new Token(type, Current.Position, null, null);
     }
 
+    private Expression ParseExpression()
+    {
+        return ParseTerm();
+    }
+
     public SyntaxTree Parse()
     {
         var expression = ParseTerm();
@@ -89,7 +96,15 @@ public class Parser
 
     private Expression ParsePrimary()
     {
+        if (Current.Type == TokenType.OpenParenthesis)
+        {
+            var left = NextToken();
+            var expression = ParseExpression();
+            var right = Match(TokenType.CloseParenthesis);
+            return new ParenthesisExpression(left, expression, right);
+        }
+        
         var numberToken = Match(TokenType.Number);
-        return new NumberExpression(numberToken);
+        return new NumberExpression(numberToken); 
     }
 }

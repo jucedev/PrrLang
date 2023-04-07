@@ -7,4 +7,10 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <Compile Update="TokenType.cs">
+        <DependentUpon>Token.cs</DependentUpon>
+      </Compile>
+    </ItemGroup>
+
 </Project>
