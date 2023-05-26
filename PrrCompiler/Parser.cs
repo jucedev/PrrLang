@@ -2,7 +2,40 @@
 
 namespace PrrCompiler;
 
-public class Parser
+internal static class SyntaxFacts
+{
+    internal static int GetBinaryOperatorPrecedence(this TokenType type)
+    {
+        switch (type)
+        {
+            case TokenType.Star:
+            case TokenType.ForwardSlash:
+                return 2;
+
+            case TokenType.Plus:
+            case TokenType.Minus:
+                return 1;
+            
+            default:
+                return 0;
+        }
+    }
+    
+    internal static int GetUnaryOperatorPrecedence(this TokenType type)
+    {
+        switch (type)
+        {
+            case TokenType.Plus:
+            case TokenType.Minus:
+                return 3;
+            
+            default:
+                return 0;
+        }
+    }
+}
+
+internal sealed class Parser
 {
     private readonly Token[] _tokens;
     private int _position;
@@ -43,7 +76,7 @@ public class Parser
         return current;   
     }
 
-    private Token Match(TokenType type)
+    private Token MatchToken(TokenType type)
     {
         if (Current.Type == type)
             return NextToken();
@@ -52,46 +85,42 @@ public class Parser
         return new Token(type, Current.Position, null, null);
     }
 
-    private Expression ParseExpression()
-    {
-        return ParseTerm();
-    }
 
-    public SyntaxTree Parse()
+    private Expression ParseExpression(int parentPrecedence = 0)
     {
-        var expression = ParseTerm();
-        var endOfFileToken = Match(TokenType.EndOfFile);
-        return new SyntaxTree(_diagnostics, expression, endOfFileToken);
+        Expression left;
+        var unaryOperatorPrecedence = Current.Type.GetUnaryOperatorPrecedence();
+
+        if (unaryOperatorPrecedence != 0 && unaryOperatorPrecedence >= parentPrecedence)
+        {
+            var operatorToken = NextToken();
+            var operandToken = ParseExpression(unaryOperatorPrecedence);
+            left = new UnaryExpression(operatorToken, operandToken);   
+        }
+        else
+        {
+            left = ParsePrimary();
+        }
+        
+        while (true)
+        {
+            var precedence = Current.Type.GetBinaryOperatorPrecedence();
+            if (precedence == 0 || precedence <= parentPrecedence)
+                break;
+            
+            var op = NextToken();
+            var right = ParseExpression(precedence);
+            left = new BinaryExpression(left, right, op);
+        }
+
+        return left;
     }
     
-    private Expression ParseTerm()
+    public SyntaxTree Parse()
     {
-        var left = ParseFactor();
-        
-        while (Current.Type == TokenType.Plus || 
-               Current.Type == TokenType.Minus) 
-        {
-            var op = NextToken();
-            var right = ParseFactor();
-            left = new BinaryExpression(left, right, op);
-        }
-
-        return left;
-    }
-
-    private Expression ParseFactor()
-    {
-        var left = ParsePrimary();
-        
-        while (Current.Type == TokenType.Star ||
-               Current.Type == TokenType.ForwardSlash)
-        {
-            var op = NextToken();
-            var right = ParsePrimary();
-            left = new BinaryExpression(left, right, op);
-        }
-
-        return left;
+        var expression = ParseExpression();
+        var endOfFileToken = MatchToken(TokenType.EndOfFile);
+        return new SyntaxTree(_diagnostics, expression, endOfFileToken);
     }
 
     private Expression ParsePrimary()
@@ -100,11 +129,11 @@ public class Parser
         {
             var left = NextToken();
             var expression = ParseExpression();
-            var right = Match(TokenType.CloseParenthesis);
+            var right = MatchToken(TokenType.CloseParenthesis);
             return new ParenthesisExpression(left, expression, right);
         }
         
-        var numberToken = Match(TokenType.Number);
-        return new NumberExpression(numberToken); 
+        var numberToken = MatchToken(TokenType.Number);
+        return new LiteralExpression(numberToken); 
     }
 }

@@ -81,7 +81,7 @@ internal static class Program
             default:
                 return false;
         }
-        // executed a command
+        
         return true;
     }
 }

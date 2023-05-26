@@ -2,17 +2,23 @@
 
 public enum TokenType
 {
-    Number,
+    // Tokens
+    BadToken,
     WhiteSpace,
+    EndOfFile,
+    Number,
+    
+    // Operators
     Plus,
     Minus,
     Star,
     ForwardSlash,
     OpenParenthesis,
     CloseParenthesis,
-    EndOfFile,
-    BadToken,
-    NumberExpression,
+    
+    // Expressions
     BinaryExpression,
-    ParenthesisExpression
+    UnaryExpression,
+    ParenthesisExpression,
+    LiteralExpression,
 }

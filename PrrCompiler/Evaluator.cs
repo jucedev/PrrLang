@@ -19,12 +19,20 @@ public class Evaluator
     {
         switch (node)
         {
-            case NumberExpression n:
-                if (int.TryParse(n.NumberToken.Value as string, out var result))
+            case LiteralExpression n:
+                if (int.TryParse(n.LiteralToken.Value as string, out var result))
                     return result;
                 
-                throw new Exception("Number d");
+                throw new Exception("Number expected");
             
+            case UnaryExpression u:
+                 var operand = EvaluateExpression(u.Operand);
+                    return u.Operator switch
+                    {
+                        {Type: TokenType.Plus} => operand,
+                        {Type: TokenType.Minus} => -operand,
+                        _ => throw new Exception($"Unexpected unary operator {u.Operator.Type}")
+                    };
             case BinaryExpression b:
             {
                 var left = EvaluateExpression(b.Left);
