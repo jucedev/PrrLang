@@ -1,4 +1,4 @@
-﻿namespace PrrCompiler;
+﻿namespace PrrCompiler.Syntax;
 
 internal class Lexer
 {
