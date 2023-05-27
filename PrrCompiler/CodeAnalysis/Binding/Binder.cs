@@ -23,10 +23,10 @@ internal sealed class Binder
     {
         var left = BindExpression(syntax.Left);
         var right = BindExpression(syntax.Right);
-        var operatorType = BindBinaryOperatorType(syntax.Operator.Type, left.ExpressionType, right.ExpressionType);
+        var boundOperator = BoundBinaryOperator.Bind(syntax.Operator.Type, left.ExpressionType, right.ExpressionType);
 
-        if (operatorType != null) 
-            return new BoundBinaryExpression(left, right, (BoundBinaryOperatorType) operatorType);
+        if (boundOperator != null) 
+            return new BoundBinaryExpression(left, right, boundOperator);
         
         _diagnostics.Add($@"Binary operator {syntax.Operator.Value} is not defined for types {left.ExpressionType} and {right.ExpressionType}");
         return left;
@@ -40,64 +40,13 @@ internal sealed class Binder
     
     private BoundExpression BindUnaryExpression(UnaryExpression syntax)
     {
-        var operand = BindExpression(syntax.Operand);
-        var operatorType = BindUnaryOperatorType(syntax.Operator.Type, operand.ExpressionType);
+        var boundOperand = BindExpression(syntax.Operand);
+        var boundOperator = BoundUnaryOperator.Bind(syntax.Operator.Type, boundOperand.ExpressionType);
 
-        if (operatorType != null) 
-            return new BoundUnaryExpression((BoundUnaryOperatorType)operatorType, operand);
+        if (boundOperator != null) 
+            return new BoundUnaryExpression(boundOperator, boundOperand);
         
-        _diagnostics.Add($"Unary operator '{syntax.Operator.Value}' is not defined for type {operand.ExpressionType}");
-        return operand;
-    }
-
-    private BoundBinaryOperatorType? BindBinaryOperatorType(TokenType operatorType, Type leftType, Type rightType)
-    {
-        if (leftType == typeof(int) || rightType == typeof(int))
-        {
-            return operatorType switch
-            {
-                TokenType.Plus => BoundBinaryOperatorType.Addition,
-                TokenType.Minus => BoundBinaryOperatorType.Subtraction,
-                TokenType.Star => BoundBinaryOperatorType.Multiplication,
-                TokenType.ForwardSlash => BoundBinaryOperatorType.Division,
-                _ => null
-            };
-        }
-
-        if (leftType == typeof(bool) || rightType == typeof(bool))
-        {
-            return operatorType switch
-            {
-                TokenType.AmpersandAmpersand => BoundBinaryOperatorType.LogicalAnd,
-                TokenType.PipePipe => BoundBinaryOperatorType.LogicalOr,
-                _ => null
-            };
-        }
-
-        return null;
-    }
-
-    private static BoundUnaryOperatorType? BindUnaryOperatorType(TokenType operatorType, Type operandType)
-    {
-        if (operandType == typeof(int))
-        {
-            return operatorType switch
-            {
-                TokenType.Plus => BoundUnaryOperatorType.Identity,
-                TokenType.Minus => BoundUnaryOperatorType.Negation,
-                _ => null
-            };
-        }
-
-        if (operandType == typeof(bool))
-        {
-            return operatorType switch
-            {
-                TokenType.Bang => BoundUnaryOperatorType.LogicalNegation,
-                _ => null
-            };
-        }
-        
-        return null;
+        _diagnostics.Add($"Unary operator '{syntax.Operator.Value}' is not defined for type {boundOperand.ExpressionType}");
+        return boundOperand;
     }
 }

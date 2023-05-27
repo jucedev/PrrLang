@@ -4,12 +4,12 @@ internal class BoundUnaryExpression : BoundExpression
 {
     public override BoundNodeType Type => BoundNodeType.UnaryExpression;
     public override Type ExpressionType => Operand.ExpressionType;
-    public BoundUnaryOperatorType OperatorType { get; }
+    public BoundUnaryOperator Operator { get; }
     public BoundExpression Operand { get; }
 
-    public BoundUnaryExpression(BoundUnaryOperatorType operatorType, BoundExpression operand)
+    public BoundUnaryExpression(BoundUnaryOperator @operator, BoundExpression operand)
     {
-        OperatorType = operatorType;
+        Operator = @operator;
         Operand = operand;
     }
 }

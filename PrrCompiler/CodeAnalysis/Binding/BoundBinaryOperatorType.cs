@@ -1,6 +1,6 @@
 ﻿namespace PrrCompiler.CodeAnalysis.Binding;
 
-internal enum BoundBinaryOperatorType
+public enum BoundBinaryOperatorType
 {
     Addition,
     Subtraction,

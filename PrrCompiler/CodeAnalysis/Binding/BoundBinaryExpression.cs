@@ -6,12 +6,12 @@ internal sealed class BoundBinaryExpression : BoundExpression
     public override Type ExpressionType => Left.ExpressionType;
     public BoundExpression Left { get; }
     public BoundExpression Right { get; }
-    public BoundBinaryOperatorType OperatorType { get; }
+    public BoundBinaryOperator Operator { get; }
 
-    public BoundBinaryExpression(BoundExpression left, BoundExpression right, BoundBinaryOperatorType operatorType)
+    public BoundBinaryExpression(BoundExpression left, BoundExpression right, BoundBinaryOperator @operator)
     {
         Left = left;
         Right = right;
-        OperatorType = operatorType;
+        Operator = @operator;
     }
 }
