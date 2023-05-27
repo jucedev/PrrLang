@@ -50,32 +50,54 @@ internal sealed class Binder
         return operand;
     }
 
-    private static BoundBinaryOperatorType? BindBinaryOperatorType(TokenType operatorType, Type leftType, Type rightType)
+    private BoundBinaryOperatorType? BindBinaryOperatorType(TokenType operatorType, Type leftType, Type rightType)
     {
-        // if left/right value doesn't parse to int, return null
-        if (leftType != typeof(int) || rightType != typeof(int))
-            return null;
-        
-        return operatorType switch
+        if (leftType == typeof(int) || rightType == typeof(int))
         {
-            TokenType.Plus => BoundBinaryOperatorType.Addition,
-            TokenType.Minus => BoundBinaryOperatorType.Subtraction,
-            TokenType.Star => BoundBinaryOperatorType.Multiplication,
-            TokenType.ForwardSlash => BoundBinaryOperatorType.Division,
-            _ => throw new Exception($@"Unexpected binary operator {operatorType}")
-        };
+            return operatorType switch
+            {
+                TokenType.Plus => BoundBinaryOperatorType.Addition,
+                TokenType.Minus => BoundBinaryOperatorType.Subtraction,
+                TokenType.Star => BoundBinaryOperatorType.Multiplication,
+                TokenType.ForwardSlash => BoundBinaryOperatorType.Division,
+                _ => null
+            };
+        }
+
+        if (leftType == typeof(bool) || rightType == typeof(bool))
+        {
+            return operatorType switch
+            {
+                TokenType.AmpersandAmpersand => BoundBinaryOperatorType.LogicalAnd,
+                TokenType.PipePipe => BoundBinaryOperatorType.LogicalOr,
+                _ => null
+            };
+        }
+
+        return null;
     }
 
     private static BoundUnaryOperatorType? BindUnaryOperatorType(TokenType operatorType, Type operandType)
     {
-        if (operandType != typeof(int))
-            return null;
-        
-        return operatorType switch
+        if (operandType == typeof(int))
         {
-            TokenType.Plus => BoundUnaryOperatorType.Identity,
-            TokenType.Minus => BoundUnaryOperatorType.Negation,
-            _ => throw new Exception($@"Unexpected unary operator {operatorType}")
-        };
+            return operatorType switch
+            {
+                TokenType.Plus => BoundUnaryOperatorType.Identity,
+                TokenType.Minus => BoundUnaryOperatorType.Negation,
+                _ => null
+            };
+        }
+
+        if (operandType == typeof(bool))
+        {
+            return operatorType switch
+            {
+                TokenType.Bang => BoundUnaryOperatorType.LogicalNegation,
+                _ => null
+            };
+        }
+        
+        return null;
     }
 }

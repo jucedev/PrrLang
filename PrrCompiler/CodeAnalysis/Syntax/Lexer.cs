@@ -5,14 +5,22 @@ internal class Lexer
     private readonly string _text;
     private int _position;
     private readonly List<string> _diagnostics = new();
-    private char CurrentChar => 
-        _position >= _text.Length ? '\0' : _text[_position];
+    private char CurrentChar => Peek();
+    private char NextChar => Peek(1);
     
     public IEnumerable<string> Diagnostic => _diagnostics;
 
     public Lexer(string text)
     {
         _text = text;
+    }
+    
+    private void Next() => _position++;
+
+    private char Peek(int offset = 0)
+    {
+        var index = _position + offset;
+        return index >= _text.Length ? '\0' : _text[index];
     }
 
     public Token NextToken()
@@ -67,22 +75,33 @@ internal class Lexer
             return new Token(type, _position, text, null);
         }
 
-        var returnToken = CurrentChar switch
+        switch (CurrentChar)
         {
-            '+' => new Token(TokenType.Plus, _position++, "+", null),
-            '-' => new Token(TokenType.Minus, _position++, "-", null),
-            '*' => new Token(TokenType.Star, _position++, "*", null),
-            '/' => new Token(TokenType.ForwardSlash, _position++, "/", null),
-            '(' => new Token(TokenType.OpenParenthesis, _position++, "(", null),
-            ')' => new Token(TokenType.CloseParenthesis, _position++, ")", null),
-            _ => new Token(TokenType.BadToken, _position++, _text.Substring(_position - 1, 1), null)
-        };
-
-        if (returnToken.Type == TokenType.BadToken) 
-            _diagnostics.Add($"ERROR: bad token: '{returnToken.Value}'");
+            case '+':
+                return new Token(TokenType.Plus, _position++, "+", null);
+            case '-':
+                return new Token(TokenType.Minus, _position++, "-", null);
+            case '*':
+                return new Token(TokenType.Star, _position++, "*", null);
+            case '/':
+                return new Token(TokenType.ForwardSlash, _position++, "/", null);
+            case '(':
+                return new Token(TokenType.OpenParenthesis, _position++, "(", null);
+            case ')':
+                return new Token(TokenType.CloseParenthesis, _position++, ")", null);
+            case '!':
+                return new Token(TokenType.Bang, _position++, "!", null);
+            case '&':
+                if (NextChar == '&')
+                    return new Token(TokenType.AmpersandAmpersand, _position += 2, "&&", null);
+                break;
+            case '|':
+                if (NextChar == '|')
+                    return new Token(TokenType.PipePipe, _position += 2, "||", null);
+                break;
+        }
         
-        return returnToken;
+        _diagnostics.Add($"ERROR: bad token: '{TokenType.BadToken}'");
+        return new Token(TokenType.BadToken, _position++, _text.Substring(_position - 1, 1), null);;
     }
-
-    private void Next() => _position++;
 }

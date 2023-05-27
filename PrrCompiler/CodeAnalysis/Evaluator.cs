@@ -21,15 +21,17 @@ internal class Evaluator
         {
             case BoundBinaryExpression b:
             {
-                var left = (int) EvaluateExpression(b.Left);
-                var right = (int) EvaluateExpression(b.Right);
+                var left = EvaluateExpression(b.Left);
+                var right = EvaluateExpression(b.Right);
 
                 return b.OperatorType switch
                 {
-                    BoundBinaryOperatorType.Addition => left + right,
-                    BoundBinaryOperatorType.Subtraction => left - right,
-                    BoundBinaryOperatorType.Multiplication => left * right,
-                    BoundBinaryOperatorType.Division => left / right,
+                    BoundBinaryOperatorType.Addition => (int) left + (int) right,
+                    BoundBinaryOperatorType.Subtraction => (int) left - (int) right,
+                    BoundBinaryOperatorType.Multiplication => (int) left * (int) right,
+                    BoundBinaryOperatorType.Division => (int) left / (int) right,
+                    BoundBinaryOperatorType.LogicalAnd => (bool) left && (bool) right,
+                    BoundBinaryOperatorType.LogicalOr => (bool) left || (bool) right,
                     _ => throw new Exception($"Unexpected binary operator {b.OperatorType}")
                 };
             }
@@ -38,13 +40,14 @@ internal class Evaluator
                 return n.Value;
                 
             case BoundUnaryExpression u:
-                 var operand = (int) EvaluateExpression(u.Operand);
-                    return u.OperatorType switch
-                    {
-                        BoundUnaryOperatorType.Identity => operand,
-                        BoundUnaryOperatorType.Negation => -operand,
-                        _ => throw new Exception($"Unexpected unary operator {u.OperatorType}")
-                    };
+                var operand = EvaluateExpression(u.Operand);
+                return u.OperatorType switch
+                {
+                    BoundUnaryOperatorType.Identity => (int) operand,
+                    BoundUnaryOperatorType.Negation => -(int) operand,
+                    BoundUnaryOperatorType.LogicalNegation => !(bool) operand,
+                    _ => throw new Exception($"Unexpected unary operator {u.OperatorType}")
+                };
             
             default:
                 throw new Exception($"Unexpected node {node.Type}");

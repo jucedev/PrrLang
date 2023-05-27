@@ -6,6 +6,11 @@ public enum TokenType
     BadToken,
     WhiteSpace,
     EndOfFile,
+    Ampersand,
+    AmpersandAmpersand,
+    Pipe,
+    PipePipe,
+    Bang,
     Number,
     Identifier,
     

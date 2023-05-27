@@ -4,4 +4,5 @@ internal enum BoundUnaryOperatorType
 {
     Identity,
     Negation,
+    LogicalNegation
 }
