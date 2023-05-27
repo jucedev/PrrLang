@@ -10,19 +10,19 @@ internal class Evaluator
         _root = root;
     }
     
-    public int Evaluate()
+    public object Evaluate()
     {
         return EvaluateExpression(_root);
     }
     
-    private static int EvaluateExpression(BoundExpression node)
+    private static object EvaluateExpression(BoundExpression node)
     {
         switch (node)
         {
             case BoundBinaryExpression b:
             {
-                var left = EvaluateExpression(b.Left);
-                var right = EvaluateExpression(b.Right);
+                var left = (int) EvaluateExpression(b.Left);
+                var right = (int) EvaluateExpression(b.Right);
 
                 return b.OperatorType switch
                 {
@@ -35,13 +35,10 @@ internal class Evaluator
             }
             
             case BoundLiteralExpression n:
-                if (int.TryParse(n.Value.ToString(), out var result))
-                    return result;
+                return n.Value;
                 
-                throw new Exception("Number expected");
-            
             case BoundUnaryExpression u:
-                 var operand = EvaluateExpression(u.Operand);
+                 var operand = (int) EvaluateExpression(u.Operand);
                     return u.OperatorType switch
                     {
                         BoundUnaryOperatorType.Identity => operand,
@@ -54,4 +51,3 @@ internal class Evaluator
         }
     }
 }
-

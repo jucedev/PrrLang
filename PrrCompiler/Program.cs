@@ -28,7 +28,7 @@ internal static class Program
             if (_showTree)
                 Print(syntaxTree.Root);
 
-            if (!syntaxTree.Diagnostics.Any())
+            if (!diagnostics.Any())
             {
                 var evaluator = new Evaluator(boundExpression);
                 var result = evaluator.Evaluate();

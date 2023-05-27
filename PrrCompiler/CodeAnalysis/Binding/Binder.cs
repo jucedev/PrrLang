@@ -32,10 +32,9 @@ internal sealed class Binder
         return left;
     }
 
-    private static BoundExpression BindLiteralExpression(LiteralExpression syntax)
+    private BoundExpression BindLiteralExpression(LiteralExpression syntax)
     {
-        int value;
-        value = int.TryParse(syntax.LiteralToken.Value!.ToString(), out value) ? value : 0;
+        var value = syntax.Value ?? 0;
         return new BoundLiteralExpression(value);
     }
     
@@ -47,13 +46,13 @@ internal sealed class Binder
         if (operatorType != null) 
             return new BoundUnaryExpression((BoundUnaryOperatorType)operatorType, operand);
         
-        
         _diagnostics.Add($"Unary operator '{syntax.Operator.Value}' is not defined for type {operand.ExpressionType}");
         return operand;
     }
 
     private static BoundBinaryOperatorType? BindBinaryOperatorType(TokenType operatorType, Type leftType, Type rightType)
     {
+        // if left/right value doesn't parse to int, return null
         if (leftType != typeof(int) || rightType != typeof(int))
             return null;
         
@@ -66,12 +65,12 @@ internal sealed class Binder
             _ => throw new Exception($@"Unexpected binary operator {operatorType}")
         };
     }
-    
+
     private static BoundUnaryOperatorType? BindUnaryOperatorType(TokenType operatorType, Type operandType)
     {
         if (operandType != typeof(int))
             return null;
-            
+        
         return operatorType switch
         {
             TokenType.Plus => BoundUnaryOperatorType.Identity,

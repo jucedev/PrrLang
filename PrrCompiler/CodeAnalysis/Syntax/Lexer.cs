@@ -4,7 +4,7 @@ internal class Lexer
 {
     private readonly string _text;
     private int _position;
-    private List<string> _diagnostics = new();
+    private readonly List<string> _diagnostics = new();
     private char CurrentChar => 
         _position >= _text.Length ? '\0' : _text[_position];
     
@@ -52,6 +52,19 @@ internal class Lexer
             var text = _text.Substring(start, length);
             
             return new Token(TokenType.WhiteSpace, start, text, null);
+        }
+
+        if (char.IsLetter(CurrentChar))
+        {
+            var start = _position;
+            
+            while (char.IsLetter(CurrentChar))
+                Next();
+            
+            var length = _position - start;
+            var text = _text.Substring(start, length);
+            var type = SyntaxFacts.GetKeywordType(text);
+            return new Token(type, _position, text, null);
         }
 
         var returnToken = CurrentChar switch

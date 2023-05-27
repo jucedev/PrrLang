@@ -7,6 +7,7 @@ public enum TokenType
     WhiteSpace,
     EndOfFile,
     Number,
+    Identifier,
     
     // Operators
     Plus,
@@ -15,6 +16,10 @@ public enum TokenType
     ForwardSlash,
     OpenParenthesis,
     CloseParenthesis,
+    
+    // keywords
+    FalseKeyword,
+    TrueKeyword,
     
     // Expressions
     BinaryExpression,

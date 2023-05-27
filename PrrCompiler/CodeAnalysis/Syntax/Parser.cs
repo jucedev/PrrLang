@@ -33,6 +33,16 @@ internal static class SyntaxFacts
                 return 0;
         }
     }
+
+    public static TokenType GetKeywordType(string text)
+    {
+        return text switch
+        {
+            "true" => TokenType.TrueKeyword,
+            "false" => TokenType.FalseKeyword,
+            _ => TokenType.Identifier
+        };
+    }
 }
 
 internal sealed class Parser
@@ -85,6 +95,12 @@ internal sealed class Parser
         return new Token(type, Current.Position, null, null);
     }
 
+    public SyntaxTree Parse()
+    {
+        var expression = ParseExpression();
+        var endOfFileToken = MatchToken(TokenType.EndOfFile);
+        return new SyntaxTree(_diagnostics, expression, endOfFileToken);
+    }
 
     private Expression ParseExpression(int parentPrecedence = 0)
     {
@@ -112,28 +128,29 @@ internal sealed class Parser
             var right = ParseExpression(precedence);
             left = new BinaryExpression(left, right, op);
         }
-
+ 
         return left;
-    }
-    
-    public SyntaxTree Parse()
-    {
-        var expression = ParseExpression();
-        var endOfFileToken = MatchToken(TokenType.EndOfFile);
-        return new SyntaxTree(_diagnostics, expression, endOfFileToken);
     }
 
     private Expression ParsePrimary()
     {
-        if (Current.Type == TokenType.OpenParenthesis)
+        switch (Current.Type)
         {
-            var left = NextToken();
-            var expression = ParseExpression();
-            var right = MatchToken(TokenType.CloseParenthesis);
-            return new ParenthesisExpression(left, expression, right);
+            case TokenType.OpenParenthesis:
+                var left = NextToken();
+                var expression = ParseExpression();
+                var right = MatchToken(TokenType.CloseParenthesis);
+                return new ParenthesisExpression(left, expression, right);
+            
+            case TokenType.TrueKeyword:
+            case TokenType.FalseKeyword:
+                var keywordToken = NextToken();
+                var value = keywordToken.Type == TokenType.TrueKeyword;
+                return new LiteralExpression(keywordToken, value);
+            
+            default:
+                var numberToken = MatchToken(TokenType.Number);
+                return new LiteralExpression(numberToken);
         }
-        
-        var numberToken = MatchToken(TokenType.Number);
-        return new LiteralExpression(numberToken); 
     }
 }
