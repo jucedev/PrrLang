@@ -1,4 +1,4 @@
-﻿namespace PrrCompiler.Expressions;
+﻿namespace PrrCompiler.CodeAnalysis.Syntax.Expressions;
 
 public sealed class UnaryExpression : Expression
 {

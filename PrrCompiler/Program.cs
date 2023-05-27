@@ -1,4 +1,8 @@
-﻿namespace PrrCompiler;
+﻿using PrrCompiler.CodeAnalysis;
+using PrrCompiler.CodeAnalysis.Binding;
+using PrrCompiler.CodeAnalysis.Syntax;
+
+namespace PrrCompiler;
 
 internal static class Program
 {
@@ -14,20 +18,25 @@ internal static class Program
             if (string.IsNullOrWhiteSpace(input) || 
                 EvaluateCommands(input))
                 continue;
-
+            
             var syntaxTree = SyntaxTree.Parse(input);
+            var binder = new Binder();
+            var boundExpression = binder.BindExpression(syntaxTree.Root);
+            
+            var diagnostics = syntaxTree.Diagnostics.Concat(binder.Diagnostics).ToArray();
+            
             if (_showTree)
                 Print(syntaxTree.Root);
 
             if (!syntaxTree.Diagnostics.Any())
             {
-                var evaluator = new Evaluator(syntaxTree.Root);
+                var evaluator = new Evaluator(boundExpression);
                 var result = evaluator.Evaluate();
                 Console.WriteLine(result);
             }
             else
             {
-                PrintDiagnostics(syntaxTree.Diagnostics);
+                PrintDiagnostics(diagnostics);
             }
         }
     }

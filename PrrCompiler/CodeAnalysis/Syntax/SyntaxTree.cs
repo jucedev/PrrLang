@@ -1,6 +1,6 @@
-﻿using PrrCompiler.Expressions;
+﻿using PrrCompiler.CodeAnalysis.Syntax.Expressions;
 
-namespace PrrCompiler;
+namespace PrrCompiler.CodeAnalysis.Syntax;
 
 public sealed class SyntaxTree
 {

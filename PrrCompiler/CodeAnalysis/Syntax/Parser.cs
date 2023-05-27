@@ -1,7 +1,6 @@
-﻿using PrrCompiler.Expressions;
-using PrrCompiler.Syntax;
+﻿using PrrCompiler.CodeAnalysis.Syntax.Expressions;
 
-namespace PrrCompiler;
+namespace PrrCompiler.CodeAnalysis.Syntax;
 
 internal static class SyntaxFacts
 {

@@ -1,4 +1,4 @@
-﻿namespace PrrCompiler;
+﻿namespace PrrCompiler.CodeAnalysis.Syntax;
 
 public class Token : Node
 {
