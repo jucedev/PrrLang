@@ -30,6 +30,8 @@ internal class Evaluator
                     BoundBinaryOperatorType.Subtraction => (int) left - (int) right,
                     BoundBinaryOperatorType.Multiplication => (int) left * (int) right,
                     BoundBinaryOperatorType.Division => (int) left / (int) right,
+                    BoundBinaryOperatorType.Equals => Equals(left, right),
+                    BoundBinaryOperatorType.NotEquals => !Equals(left, right),
                     BoundBinaryOperatorType.LogicalAnd => (bool) left && (bool) right,
                     BoundBinaryOperatorType.LogicalOr => (bool) left || (bool) right,
                     _ => throw new Exception($"Unexpected binary operator {b.Operator.Type}")

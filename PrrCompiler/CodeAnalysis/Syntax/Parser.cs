@@ -10,9 +10,12 @@ internal static class SyntaxFacts
         {
             case TokenType.Star:
             case TokenType.ForwardSlash:
-                return 4;
+                return 5;
             case TokenType.Plus:
             case TokenType.Minus:
+                return 4;
+            case TokenType.EqualsEquals:
+            case TokenType.BangEquals:
                 return 3;
             case TokenType.AmpersandAmpersand:
                 return 2;
@@ -30,7 +33,7 @@ internal static class SyntaxFacts
             case TokenType.Plus:
             case TokenType.Minus:
             case TokenType.Bang:
-                return 5;
+                return 6;
             
             default:
                 return 0;

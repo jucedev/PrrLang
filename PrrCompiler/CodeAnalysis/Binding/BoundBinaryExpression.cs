@@ -3,7 +3,7 @@
 internal sealed class BoundBinaryExpression : BoundExpression
 {
     public override BoundNodeType Type => BoundNodeType.BinaryExpression;
-    public override Type ExpressionType => Left.ExpressionType;
+    public override Type ExpressionType => Operator.ResultType;
     public BoundExpression Left { get; }
     public BoundExpression Right { get; }
     public BoundBinaryOperator Operator { get; }

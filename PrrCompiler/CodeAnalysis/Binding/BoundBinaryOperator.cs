@@ -21,8 +21,14 @@ public class BoundBinaryOperator
         ResultType = resultType;
     }
 
-    public BoundBinaryOperator(TokenType tokenType, BoundBinaryOperatorType operatorType, Type type)
-        : this(tokenType, operatorType, type, type, type)
+
+    public BoundBinaryOperator(TokenType tokenType, BoundBinaryOperatorType operatorType, Type operandType)
+        : this(tokenType, operatorType, operandType, operandType, operandType)
+    {
+    }
+    
+    public BoundBinaryOperator(TokenType tokenType, BoundBinaryOperatorType operatorType, Type operandType, Type resultType)
+        : this(tokenType, operatorType, operandType, operandType, resultType)
     {
     }
 
@@ -32,10 +38,16 @@ public class BoundBinaryOperator
         new BoundBinaryOperator(TokenType.Minus, BoundBinaryOperatorType.Subtraction, typeof(int)),
         new BoundBinaryOperator(TokenType.Star, BoundBinaryOperatorType.Multiplication, typeof(int)),
         new BoundBinaryOperator(TokenType.ForwardSlash, BoundBinaryOperatorType.Division, typeof(int)),
+        
+        new BoundBinaryOperator(TokenType.EqualsEquals, BoundBinaryOperatorType.Equals, typeof(bool)),
+        new BoundBinaryOperator(TokenType.BangEquals, BoundBinaryOperatorType.NotEquals, typeof(bool)),
+        new BoundBinaryOperator(TokenType.EqualsEquals, BoundBinaryOperatorType.Equals, typeof(int), typeof(bool)),
+        new BoundBinaryOperator(TokenType.BangEquals, BoundBinaryOperatorType.NotEquals, typeof(int), typeof(bool)),
+        
         new BoundBinaryOperator(TokenType.AmpersandAmpersand, BoundBinaryOperatorType.LogicalAnd, typeof(bool)),
         new BoundBinaryOperator(TokenType.PipePipe, BoundBinaryOperatorType.LogicalOr, typeof(bool)),
     };
-
+ 
     public static BoundBinaryOperator? Bind(TokenType tokenType, Type leftType, Type rightType)
     {
         return Operators.FirstOrDefault(op =>

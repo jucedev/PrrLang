@@ -89,8 +89,6 @@ internal class Lexer
                 return new Token(TokenType.OpenParenthesis, _position++, "(", null);
             case ')':
                 return new Token(TokenType.CloseParenthesis, _position++, ")", null);
-            case '!':
-                return new Token(TokenType.Bang, _position++, "!", null);
             case '&':
                 if (NextChar == '&')
                     return new Token(TokenType.AmpersandAmpersand, _position += 2, "&&", null);
@@ -99,6 +97,14 @@ internal class Lexer
                 if (NextChar == '|')
                     return new Token(TokenType.PipePipe, _position += 2, "||", null);
                 break;
+            case '=':
+                if (NextChar == '=')
+                    return new Token(TokenType.EqualsEquals, _position += 2, "==", null);
+                break;
+            case '!':
+                return NextChar == '=' ? 
+                    new Token(TokenType.BangEquals, _position += 2, "!=", null) : 
+                    new Token(TokenType.Bang, _position++, "!", null);
         }
         
         _diagnostics.Add($"ERROR: bad token: '{TokenType.BadToken}'");

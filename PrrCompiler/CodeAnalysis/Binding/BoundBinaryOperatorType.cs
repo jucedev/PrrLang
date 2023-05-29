@@ -6,6 +6,8 @@ public enum BoundBinaryOperatorType
     Subtraction,
     Multiplication,
     Division,
+    Equals,
+    NotEquals,
     LogicalAnd,
-    LogicalOr
+    LogicalOr,
 }

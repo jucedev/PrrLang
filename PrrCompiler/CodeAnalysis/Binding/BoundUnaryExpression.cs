@@ -3,7 +3,7 @@
 internal class BoundUnaryExpression : BoundExpression
 {
     public override BoundNodeType Type => BoundNodeType.UnaryExpression;
-    public override Type ExpressionType => Operand.ExpressionType;
+    public override Type ExpressionType => Operator.ResultType!;
     public BoundUnaryOperator Operator { get; }
     public BoundExpression Operand { get; }
 
