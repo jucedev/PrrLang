@@ -15,6 +15,7 @@ internal sealed class Binder
             TokenType.BinaryExpression => BindBinaryExpression((BinaryExpression) syntax),
             TokenType.LiteralExpression => BindLiteralExpression((LiteralExpression) syntax),
             TokenType.UnaryExpression => BindUnaryExpression((UnaryExpression) syntax),
+            TokenType.ParenthesisExpression => BindExpression(((ParenthesisExpression) syntax).ParenthesizedExpression),
             _ => throw new Exception($@"Unexpected syntax {syntax.Type}")
         };
     }
