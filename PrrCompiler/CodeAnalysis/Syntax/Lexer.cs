@@ -4,11 +4,11 @@ internal class Lexer
 {
     private readonly string _text;
     private int _position;
-    private readonly List<string> _diagnostics = new();
+    private readonly DiagnosticCollection _diagnosticses = new();
     private char CurrentChar => Peek();
     private char NextChar => Peek(1);
     
-    public IEnumerable<string> Diagnostic => _diagnostics;
+    public DiagnosticCollection Diagnostics => _diagnosticses;
 
     public Lexer(string text)
     {
@@ -33,9 +33,10 @@ internal class Lexer
         if (_position >= _text.Length)
             return new Token(TokenType.EndOfFile, _position, "\0", null);
 
+        var start = _position;
+        
         if (char.IsDigit(CurrentChar))
         {
-            var start = _position;
             
             while (char.IsDigit(CurrentChar))
                 Next();
@@ -44,15 +45,13 @@ internal class Lexer
             var text = _text.Substring(start, length);
 
             if (!int.TryParse(text, out var value))
-                _diagnostics.Add($"ERROR: bad number '{text}' cannot be represented by an Int32");
+                _diagnosticses.ReportInvalidNumber(new TextSpan(start, length), text, typeof(int));
             
             return new Token(TokenType.Number, start, text, value);
         }
 
         if (char.IsWhiteSpace(CurrentChar))
-        {
-            var start = _position;
-            
+        {   
             while (char.IsWhiteSpace(CurrentChar))
                 Next();
             
@@ -64,8 +63,6 @@ internal class Lexer
 
         if (char.IsLetter(CurrentChar))
         {
-            var start = _position;
-            
             while (char.IsLetter(CurrentChar))
                 Next();
             
@@ -91,23 +88,36 @@ internal class Lexer
                 return new Token(TokenType.CloseParenthesis, _position++, ")", null);
             case '&':
                 if (NextChar == '&')
-                    return new Token(TokenType.AmpersandAmpersand, _position += 2, "&&", null);
+                {
+                    _position += 2;
+                    return new Token(TokenType.AmpersandAmpersand, start, "&&", null);
+                }
                 break;
             case '|':
                 if (NextChar == '|')
-                    return new Token(TokenType.PipePipe, _position += 2, "||", null);
+                {
+                    _position += 2;
+                    return new Token(TokenType.PipePipe, start, "||", null);
+                }
                 break;
             case '=':
                 if (NextChar == '=')
-                    return new Token(TokenType.EqualsEquals, _position += 2, "==", null);
+                {
+                    _position += 2;
+                    return new Token(TokenType.EqualsEquals, start, "==", null);
+                }
                 break;
             case '!':
-                return NextChar == '=' ? 
-                    new Token(TokenType.BangEquals, _position += 2, "!=", null) : 
-                    new Token(TokenType.Bang, _position++, "!", null);
+                if (NextChar == '=')
+                {
+                    _position += 2;
+                    return new Token(TokenType.BangEquals, start, "!=", null);
+                }
+                _position++;
+                return new Token(TokenType.Bang, start, "!", null);
         }
         
-        _diagnostics.Add($"ERROR: bad token: '{TokenType.BadToken}'");
+        _diagnosticses.ReportBadCharacter(_position, CurrentChar);
         return new Token(TokenType.BadToken, _position++, _text.Substring(_position - 1, 1), null);;
     }
 }

@@ -4,10 +4,10 @@ namespace PrrCompiler.CodeAnalysis.Syntax;
 
 public sealed class SyntaxTree
 {
-    public IEnumerable<string> Diagnostics { get; }
+    public IEnumerable<Diagnostic> Diagnostics { get; }
     public Expression Root { get; }
     private Token _endOfFileToken;
-    public SyntaxTree(IEnumerable<string> diagnostics, Expression root, Token endOfFileToken)
+    public SyntaxTree(IEnumerable<Diagnostic> diagnostics, Expression root, Token endOfFileToken)
     {
         Diagnostics = diagnostics;
         Root = root;

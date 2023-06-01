@@ -1,4 +1,6 @@
-﻿namespace PrrCompiler.CodeAnalysis.Syntax;
+﻿using System.Runtime.InteropServices;
+
+namespace PrrCompiler.CodeAnalysis.Syntax;
 
 public class Token : Node
 {
@@ -9,10 +11,11 @@ public class Token : Node
     }
 
     public int Position { get; }
-    public object? Value { get; }
+    public string Value { get; }
     public object? Result { get; }
+    public TextSpan Span => new TextSpan(Position, Value.Length);
 
-    public Token(TokenType type, int position, string? value, object? result)
+    public Token(TokenType type, int position, string value, object? result)
     {
         Type = type;
         Position = position;

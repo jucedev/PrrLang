@@ -55,9 +55,9 @@ internal sealed class Parser
 {
     private readonly Token[] _tokens;
     private int _position;
-    private List<string> _diagnostics = new();
+    private DiagnosticCollection _diagnostics = new();
 
-    public IEnumerable<string> Diagnostics => _diagnostics;
+    public DiagnosticCollection Diagnostics => _diagnostics;
     public Parser(string text)
     {
         List<Token> tokens = new();
@@ -75,6 +75,7 @@ internal sealed class Parser
         } while (token.Type != TokenType.EndOfFile);
         
         _tokens = tokens.ToArray();
+        _diagnostics.AddRange(lexer.Diagnostics);
     }
     
     private Token Peek(int offset = 0)
@@ -97,7 +98,7 @@ internal sealed class Parser
         if (Current.Type == type)
             return NextToken();
         
-        _diagnostics.Add($"ERROR: Unexpected token <{Current.Type}>, expected <{type}>");
+        _diagnostics.ReportUnexpectedToken(Current.Span, Current.Type, type);
         return new Token(type, Current.Position, null, null);
     }
 

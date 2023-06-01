@@ -1,4 +1,5 @@
-﻿using PrrCompiler.CodeAnalysis;
+﻿using Microsoft.VisualBasic.FileIO;
+using PrrCompiler.CodeAnalysis;
 using PrrCompiler.CodeAnalysis.Syntax;
 
 namespace Prr;
@@ -33,7 +34,7 @@ internal static class Program
             }
             else
             {
-                PrintDiagnostics(diagnostics);
+                PrintDiagnostics(diagnostics, input);
             }
         }
     }
@@ -60,14 +61,29 @@ internal static class Program
             Print(child, indent, child == lastChild);
     }
 
-    private static void PrintDiagnostics(IEnumerable<string> diagnostics)
+    private static void PrintDiagnostics(IEnumerable<Diagnostic> diagnostics, string input)
     {
-        Console.ForegroundColor = ConsoleColor.DarkRed;
-        
-        foreach (var diagnostic in diagnostics)
-            Console.WriteLine(diagnostic);
 
-        Console.ResetColor();
+        foreach (var diagnostic in diagnostics)
+        {
+            Console.ForegroundColor = ConsoleColor.DarkRed;
+            Console.WriteLine(diagnostic);
+            Console.ResetColor();
+            
+            var prefix = input.Substring(0, diagnostic.Span.Start);
+            var error = input.Substring(diagnostic.Span.Start, diagnostic.Span.Length);
+            var suffix = input.Substring(diagnostic.Span.End);
+            
+            Console.Write("    ");
+            Console.Write(prefix);
+            
+            Console.ForegroundColor = ConsoleColor.DarkRed;
+            Console.Write(error);
+            Console.ResetColor();
+            
+            Console.Write(suffix);
+            Console.WriteLine();
+        }
     }
 
     private static bool EvaluateCommands(string input)
