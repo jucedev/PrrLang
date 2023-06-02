@@ -69,7 +69,7 @@ internal class Lexer
             var length = _position - start;
             var text = _text.Substring(start, length);
             var type = SyntaxFacts.GetKeywordType(text);
-            return new Token(type, _position, text, null);
+            return new Token(type, start, text, null);
         }
 
         switch (CurrentChar)
@@ -106,7 +106,9 @@ internal class Lexer
                     _position += 2;
                     return new Token(TokenType.EqualsEquals, start, "==", null);
                 }
-                break;
+                _position++;
+                return new Token(TokenType.Equals, start, "=", null);
+            
             case '!':
                 if (NextChar == '=')
                 {

@@ -4,12 +4,12 @@ using PrrCompiler.CodeAnalysis.Syntax;
 
 namespace Prr;
 
-internal static class Program
+internal class Program
 {
     private static bool _showTree;
-
     private static void Main(string[] args)
     {
+        var variables = new Dictionary<string, object>();
         while (true)
         {
             Console.Write("> ");
@@ -21,7 +21,7 @@ internal static class Program
             
             var syntaxTree = SyntaxTree.Parse(input);
             var compiler = new Compiler(syntaxTree);
-            var result = compiler.Evaluate();
+            var result = compiler.Evaluate(variables);
 
             var diagnostics = result.Diagnostics;
             
@@ -47,7 +47,7 @@ internal static class Program
         Console.Write(marker);
         Console.Write($"{node.Type}");
 
-        if (node is Token {Value: { }} token)
+        if (node is Token {Value: not null} token)
         {
             Console.Write($" {token.Value}");
         }
@@ -59,31 +59,6 @@ internal static class Program
         
         foreach (var child in node.GetChildren())
             Print(child, indent, child == lastChild);
-    }
-
-    private static void PrintDiagnostics(IEnumerable<Diagnostic> diagnostics, string input)
-    {
-
-        foreach (var diagnostic in diagnostics)
-        {
-            Console.ForegroundColor = ConsoleColor.DarkRed;
-            Console.WriteLine(diagnostic);
-            Console.ResetColor();
-            
-            var prefix = input.Substring(0, diagnostic.Span.Start);
-            var error = input.Substring(diagnostic.Span.Start, diagnostic.Span.Length);
-            var suffix = input.Substring(diagnostic.Span.End);
-            
-            Console.Write("    ");
-            Console.Write(prefix);
-            
-            Console.ForegroundColor = ConsoleColor.DarkRed;
-            Console.Write(error);
-            Console.ResetColor();
-            
-            Console.Write(suffix);
-            Console.WriteLine();
-        }
     }
 
     private static bool EvaluateCommands(string input)
@@ -105,5 +80,16 @@ internal static class Program
         }
         
         return true;
+    }
+
+    private static void PrintDiagnostics(IEnumerable<Diagnostic> diagnostics, string input)
+    {
+
+        foreach (var diagnostic in diagnostics)
+        {
+            Console.ForegroundColor = ConsoleColor.DarkRed;
+            Console.WriteLine(diagnostic);
+            Console.ResetColor();
+        }
     }
 }

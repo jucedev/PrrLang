@@ -41,13 +41,19 @@ internal sealed class DiagnosticCollection : IEnumerable<Diagnostic>
 
     public void ReportUndefinedUnaryOperator(TextSpan span, string operatorValue, Type expressionType)
     {
-        var message = $"Unary operator '{operatorValue}' is not defined for type {expressionType}";
+        var message = $"Operator '{operatorValue}' is not defined for type {expressionType}";
         Report(span, message);
     }
 
     public void ReportUndefinedBinaryOperator(TextSpan span, string operatorValue, Type leftExpressionType, Type rightExpressionType)
     {
-        var message = $"Binary operator '{operatorValue}' is not defined for types {leftExpressionType} and {rightExpressionType}";
+        var message = $"Operator '{operatorValue}' is not defined for types {leftExpressionType} and {rightExpressionType}";
+        Report(span, message);
+    }
+
+    public void ReportUndefinedName(TextSpan span, string name)
+    {
+        var message = $"Variable '{name}' doesn't exist.";
         Report(span, message);
     }
 }

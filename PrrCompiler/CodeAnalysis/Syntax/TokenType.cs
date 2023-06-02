@@ -6,6 +6,7 @@ public enum TokenType
     BadToken,
     WhiteSpace,
     EndOfFile,
+    Equals,
     EqualsEquals,
     BangEquals,
     AmpersandAmpersand,
@@ -31,4 +32,6 @@ public enum TokenType
     UnaryExpression,
     ParenthesisExpression,
     LiteralExpression,
+    NameExpression,
+    AssignmentExpression,
 }

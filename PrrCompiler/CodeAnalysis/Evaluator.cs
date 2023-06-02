@@ -5,9 +5,12 @@ namespace PrrCompiler.CodeAnalysis;
 internal class Evaluator
 {
     private readonly BoundExpression _root;
-    public Evaluator(BoundExpression root)
+    private readonly Dictionary<string, object> _variables;
+
+    public Evaluator(BoundExpression root, Dictionary<string, object> variables)
     {
         _root = root;
+        _variables = variables;
     }
     
     public object Evaluate()
@@ -15,10 +18,21 @@ internal class Evaluator
         return EvaluateExpression(_root);
     }
     
-    private static object EvaluateExpression(BoundExpression node)
+    private object EvaluateExpression(BoundExpression node)
     {
         switch (node)
         {
+            case BoundLiteralExpression n:
+                return n.Value;
+            
+            case BoundVariableExpression v:
+                return _variables[v.Name];
+            
+            case BoundAssignmentExpression a:
+                var value = EvaluateExpression(a.BoundExpression);
+                _variables[a.Name] = value;
+                return value;
+            
             case BoundBinaryExpression b:
             {
                 var left = EvaluateExpression(b.Left);
@@ -37,9 +51,6 @@ internal class Evaluator
                     _ => throw new Exception($"Unexpected binary operator {b.Operator.Type}")
                 };
             }
-            
-            case BoundLiteralExpression n:
-                return n.Value;
                 
             case BoundUnaryExpression u:
                 var operand = EvaluateExpression(u.Operand);

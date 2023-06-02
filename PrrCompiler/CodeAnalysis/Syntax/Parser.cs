@@ -109,7 +109,23 @@ internal sealed class Parser
         return new SyntaxTree(_diagnostics, expression, endOfFileToken);
     }
 
-    private Expression ParseExpression(int parentPrecedence = 0)
+    private Expression ParseExpression()
+    {
+        return ParseAssignmentExpression();
+    }
+
+    private Expression ParseAssignmentExpression()
+    {
+        if (Peek(0).Type != TokenType.Identifier || Peek(1).Type != TokenType.Equals) 
+            return ParseBinaryExpression();
+        
+        var identifierToken = NextToken();
+        var operatorToken = NextToken();
+        var right = ParseAssignmentExpression();
+        return new AssignmentExpression(identifierToken, operatorToken, right);
+    }
+
+    private Expression ParseBinaryExpression(int parentPrecedence = 0)
     {
         Expression left;
         var unaryOperatorPrecedence = Current.Type.GetUnaryOperatorPrecedence();
@@ -117,7 +133,7 @@ internal sealed class Parser
         if (unaryOperatorPrecedence != 0 && unaryOperatorPrecedence >= parentPrecedence)
         {
             var operatorToken = NextToken();
-            var operandToken = ParseExpression(unaryOperatorPrecedence);
+            var operandToken = ParseBinaryExpression(unaryOperatorPrecedence);
             left = new UnaryExpression(operatorToken, operandToken);   
         }
         else
@@ -132,7 +148,7 @@ internal sealed class Parser
                 break;
             
             var op = NextToken();
-            var right = ParseExpression(precedence);
+            var right = ParseBinaryExpression(precedence);
             left = new BinaryExpression(left, right, op);
         }
  
@@ -154,6 +170,10 @@ internal sealed class Parser
                 var keywordToken = NextToken();
                 var value = keywordToken.Type == TokenType.TrueKeyword;
                 return new LiteralExpression(keywordToken, value);
+            
+            case TokenType.Identifier:
+                var identifierToken = NextToken();
+                return new NameExpression(identifierToken);
             
             default:
                 var numberToken = MatchToken(TokenType.Number);

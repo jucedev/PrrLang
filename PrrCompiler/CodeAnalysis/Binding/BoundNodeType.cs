@@ -2,7 +2,9 @@
 
 public enum BoundNodeType
 {
-    BinaryExpression,
     LiteralExpression,
+    NameExpression,
+    AssignmentExpression,
     UnaryExpression,
+    BinaryExpression,
 }
