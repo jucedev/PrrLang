@@ -9,7 +9,7 @@ internal class Program
     private static bool _showTree;
     private static void Main(string[] args)
     {
-        var variables = new Dictionary<string, object>();
+        var variables = new Dictionary<VariableSymbol, object>();
         while (true)
         {
             Console.Write("> ");

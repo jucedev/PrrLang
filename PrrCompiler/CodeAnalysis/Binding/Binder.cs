@@ -6,12 +6,12 @@ namespace PrrCompiler.CodeAnalysis.Binding;
 internal sealed class Binder
 {
     private readonly DiagnosticCollection _diagnostics = new();
-    private readonly Dictionary<string, object> _variables = new();
+    private readonly Dictionary<VariableSymbol, object> _variables = new();
 
     public DiagnosticCollection Diagnostics => _diagnostics;
-    public Dictionary<string, object> Variables => _variables;
+    public Dictionary<VariableSymbol, object> Variables => _variables;
 
-    public Binder(Dictionary<string, object> variables)
+    public Binder(Dictionary<VariableSymbol, object> variables)
     {
         _variables = variables;
     }
@@ -35,31 +35,26 @@ internal sealed class Binder
         var name = syntax.IdentifierToken.Value;
         var boundExpression = BindExpression(syntax.Expression);
 
-        // TODO: clean this shit up
-        var defaultValue =
-            boundExpression.ExpressionType == typeof(int)
-                ? (object) 0
-                : boundExpression.ExpressionType == typeof(bool)
-                    ? false 
-                    : null;
+        var existingVariable = _variables.Keys.FirstOrDefault(v => v.Name == name);
+        if (existingVariable != null)
+            _variables.Remove(existingVariable);
 
-        if (defaultValue == null)
-            throw new Exception($"Unsupported variable type: {boundExpression.ExpressionType}");
+        var variable = new VariableSymbol(name, boundExpression.ExpressionType);
+        _variables[variable] = null!;
         
-        return new BoundAssignmentExpression(name, boundExpression);
+        return new BoundAssignmentExpression(variable, boundExpression);
     }
 
     private BoundExpression BindNameExpression(NameExpression syntax)
     {
         var name = syntax.IdentifierToken.Value;
-        if (!_variables.TryGetValue(name, out var value))
-        {
-            _diagnostics.ReportUndefinedName(syntax.IdentifierToken.Span, name);
-            return new BoundLiteralExpression(0);
-        }
+        var variable = _variables.Keys.FirstOrDefault(v => v.Name == name);
 
-        var type = value?.GetType() ?? typeof(object);
-        return new BoundVariableExpression(name, type);
+        if (variable != null) 
+            return new BoundVariableExpression(variable, variable.Type);
+        
+        _diagnostics.ReportUndefinedName(syntax.IdentifierToken.Span, name);
+        return new BoundLiteralExpression(0);
     }
 
     private BoundExpression BindParenthesizedExpression(ParenthesisExpression syntax)
