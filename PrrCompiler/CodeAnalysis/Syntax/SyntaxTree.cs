@@ -19,4 +19,17 @@ public sealed class SyntaxTree
         var parser = new Parser(text);
         return parser.Parse();
     }
+    
+    public static IEnumerable<Token> ParseTokens(string text)
+    {
+        var lexer = new Lexer(text);
+        while (true)
+        {
+            var token = lexer.NextToken();
+            if (token.Type == TokenType.EndOfFile)
+                break;
+
+            yield return token;
+        }
+    }
 }

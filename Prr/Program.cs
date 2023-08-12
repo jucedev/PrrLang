@@ -1,10 +1,9 @@
-﻿using Microsoft.VisualBasic.FileIO;
-using PrrCompiler.CodeAnalysis;
+﻿using PrrCompiler.CodeAnalysis;
 using PrrCompiler.CodeAnalysis.Syntax;
 
 namespace Prr;
 
-internal class Program
+internal abstract class Program
 {
     private static bool _showTree;
     private static void Main(string[] args)
